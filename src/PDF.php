@@ -41,20 +41,21 @@ class PDF{
      */
     public function __construct(ConfigRepository $config, Filesystem $files, /* Illuminate\View\Factory */ $view, $publicPath){
         $this->config = $config;
+        
         $this->files = $files;
         $this->view = $view;
         $this->public_path = $publicPath;
 
-        $this->showWarnings = $this->config->get('laravel-dompdf::show_warnings', false);
+        $this->showWarnings = $this->config->get('dompdf', false);
 
         //To prevent old configs from not working..
-        if($this->config->has('laravel-dompdf::paper')){
-            $this->paper = $this->config->get('laravel-dompdf::paper');
+        if($this->config->has('dompdf.paper')){
+            $this->paper = $this->config->get('dompdf.paper');
         }else{
             $this->paper = DOMPDF_DEFAULT_PAPER_SIZE;
         }
 
-        $this->orientation = $this->config->get('laravel-dompdf::orientation') ?: 'portrait';
+        $this->orientation = $this->config->get('dompdf.orientation') ?: 'portrait';
 
         $this->dompdf = new \DOMPDF();
         $this->dompdf->set_base_path(realpath($publicPath));
