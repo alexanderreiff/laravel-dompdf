@@ -21,9 +21,7 @@ class ServiceProvider extends IlluminateServiceProvider {
      */
     public function register()
     {
-        $this->app['config']->package('barryvdh/laravel-dompdf', __DIR__ . '/config');
-
-        $defines = $this->app['config']->get('laravel-dompdf::defines') ?: array();
+        $defines = $this->app['config']->get('dompdf.defines') ?: array();
         foreach ($defines as $key => $value) {
             $this->define($key, $value);
         }
@@ -35,20 +33,21 @@ class ServiceProvider extends IlluminateServiceProvider {
         $this->define("DOMPDF_LOG_OUTPUT_FILE", $this->app['path.storage'] . '/logs/dompdf.html');
 
         $config_file = $this->app['config']->get(
-            'laravel-dompdf::config_file'
+          'dompdf.config_file'
         ) ?: $this->app['path.base'] . '/vendor/dompdf/dompdf/dompdf_config.inc.php';
 
         if (file_exists($config_file)) {
-            require_once $config_file;
+          require_once $config_file;
         } else {
-            throw new Exception(
-                "$config_file cannot be loaded, please configure correct config file (config.php: config_file)"
-            );
+          throw new Exception(
+              "$config_file cannot be loaded, please configure correct config file (config.php: config_file)"
+          );
         }
         
-        $this->app->bind('dompdf', function ($app) {
-                return new PDF($app['config'], $app['files'], $app['view'], $app['path.public']);
-            });
+        $this->app->bind('Barryvdh\DomPDF\PDF', function ($app)
+        {
+          return new PDF($app['config'], $app['files'], $app['view'], $app['path.public']);
+        });        
     }
 
     /**
@@ -58,7 +57,7 @@ class ServiceProvider extends IlluminateServiceProvider {
      */
     public function provides()
     {
-        return array('dompdf');
+        return array('Barryvdh\DomPDF\PDF');
     }
 
     /**
